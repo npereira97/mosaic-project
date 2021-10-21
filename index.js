@@ -2,6 +2,8 @@ const express = require('express');
 const app = express();
 const PORT = 5000;
 
+const generate_schedule = require('./scheduling.js');
+
 
 const bakers = [1,2,3]
 const orders = {};
@@ -21,9 +23,6 @@ const gen_id = (() => {
 })();
 
 
-const generate_schedule = () => {
-
-}
 
 
 app.use(express.json());
@@ -38,7 +37,7 @@ app.post('/add',(req,res) => {
         res.send(500,'Cannot handle specified duration');
     }else{
         const id = gen_id();
-        orders[id] = {name,duration}
+        orders[id] = {name,duration,id}
         res.send({id})
     }
 
