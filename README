@@ -1,0 +1,7 @@
+To run, you need to execute
+
+npm install
+
+to run 
+
+node index.js

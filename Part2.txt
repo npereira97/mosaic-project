@@ -1,1 +1,59 @@
 Short Answer Questions
+
+1) My current approach to redistirbuting the orders whenever a new one is added, or one is deleted is to recalculate the the distirbution of tasks. This is certainly not optimal, but assuming the usecase, the recomputation shouldn't pose too much of a problem.
+
+I beilive that I could implement a redistirbutng algorithm with the help of a min heap data structure. Instead of each baker having a jobs queue, they would have a job heap. We could continually remove the smallest elements from each heap and try to distribute some tasks to people with fewer tasks (this glosses over many details that I would need to think about a bit more)
+
+As mentioned in the comments above the implementation, the solution that can yield the true answer is based on Linear Optimiation
+
+We define an integer linear optimization problem
+
+suppoes there are n bakers, m orders 
+
+
+I_i,j is a decision variable to tell us wheter or not we assign the ith order to the jth baker
+
+the objective is to maximize:
+
+val = 	sum i = 1 to m
+			sum j = 1 to n 
+				I_i,j
+
+This optimization would have the following constraints
+
+
+Decision variables are 0 or 1
+	0 <= I_i,j <= 1 (also only integer values permitted)
+
+
+
+Each baker works for at most 8 hours
+	For each baker b
+	work_hours = sum i = 1 to m   <= 8
+					I_i,b * (duration of order i)
+
+
+
+Each order is assigned at most once
+
+	For each order o
+	val = sum i = 1 to n 
+			I_o,i
+
+	and 0 <= val <= 1
+		
+
+
+sum from 1 to n  [] 
+
+
+2) If multiple jobs are submitted at the same time, we can choose to store all of these requests in a message queue and process incoming messages one by one and follow our normal procedure.
+
+3) If the workers had different productivites, we would use the Linear optimiation approach with with a scaling factor on the upper bound of permitted work per day. If they work with an efficiency of 1.5x, even though they would only work 8 hours a day, their effective work hours are 8 * 1.5 = 12 hours a day. This should resolve the issue
+
+For each baker b
+
+For a scaling factor s_b
+
+	work_hours = sum i = 1 to m   <= 8*s_b
+					I_i,b * (duration of order i)
