@@ -12,7 +12,6 @@ bakers.forEach(id => schedule[id] = []);
 
 const gen_id = (() => {
     var id = 0;
-
     return () => {
         const next_id = id;
         id = id + 1;
@@ -28,7 +27,7 @@ app.post('/add',(req,res) => {
     const {name,duration} = json;
 
     if (duration > 8 || duration <= 0){
-        res.send(500,'Cannot handle specified duration');
+        res.send(400,'Cannot handle specified duration');
     }else{
         const id = gen_id();
         orders[id] = {name,duration,id}
@@ -40,6 +39,7 @@ app.post('/add',(req,res) => {
             schedule = provisional_schedule;
             res.send({id,message:'Order accepted'});
         }else{
+            //if the new schedule is null we reject the order
             delete orders[id];
             res.send(500,'Order rejected');
         }
@@ -59,7 +59,7 @@ app.post('/delete',(req,res) => {
 
         res.send(`Deleted order ${id}`);
     }else{
-        res.send(500,'Invalid id, nothing to delete');
+        res.send(400,'Invalid id, nothing to delete');
     }
 
     res.send();
