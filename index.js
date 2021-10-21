@@ -2,15 +2,13 @@ const express = require('express');
 const app = express();
 const PORT = 5000;
 
-const generate_schedule = require('./scheduling.js');
-
+const {generate_schedule} = require('./scheduling.js');
 
 const bakers = [1,2,3]
 const orders = {};
 
-const schedule = {}
+var schedule = {}
 bakers.forEach(id => schedule[id] = []);
-
 
 const gen_id = (() => {
     var id = 0;
@@ -22,14 +20,10 @@ const gen_id = (() => {
     }
 })();
 
-
-
-
 app.use(express.json());
 
 app.post('/add',(req,res) => {
     const json = req.body;
-    console.log(json);
 
     const {name,duration} = json;
 
@@ -38,11 +32,20 @@ app.post('/add',(req,res) => {
     }else{
         const id = gen_id();
         orders[id] = {name,duration,id}
-        res.send({id})
+
+
+        const provisional_schedule = generate_schedule(orders,bakers);
+
+        if(provisional_schedule){
+            schedule = provisional_schedule;
+            res.send({id,message:'Order accepted'});
+        }else{
+            delete orders[id];
+            res.send(500,'Order rejected');
+        }
+    
     }
 
-
-    console.log(orders);
 });
 
 app.post('/delete',(req,res) => {
@@ -51,7 +54,9 @@ app.post('/delete',(req,res) => {
 
     if (orders[id]){
         delete orders[id];
-        console.log(orders);
+
+        schedule = generate_schedule(orders,bakers);
+
         res.send(`Deleted order ${id}`);
     }else{
         res.send(500,'Invalid id, nothing to delete');
